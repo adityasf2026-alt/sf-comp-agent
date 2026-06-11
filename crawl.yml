@@ -1,0 +1,51 @@
+name: SF Competitiveness Crawl
+
+on:
+  schedule:
+    # 8:45 AM IST = 3:15 AM UTC  (runs before 9 AM Apps Script mailer)
+    - cron: '15 3 * * *'
+    # 5:45 PM IST = 12:15 PM UTC (runs before 6 PM Apps Script mailer)
+    - cron: '15 12 * * *'
+  workflow_dispatch:   # allows manual trigger from GitHub UI
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: pip-${{ hashFiles('requirements.txt') }}
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          playwright install chromium
+          playwright install-deps chromium
+
+      - name: Run crawl
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+        run: |
+          cd src
+          python scraper.py
+
+      - name: Upload run log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: crawl-log-${{ github.run_id }}
+          path: src/*.log
+          if-no-files-found: ignore
+          retention-days: 7
