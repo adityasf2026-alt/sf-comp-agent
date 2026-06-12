@@ -35,7 +35,11 @@ class SheetsWriter:
 
     # ── Read FSN Input ──────────────────────────────────────────────────
     def read_fsn_input(self) -> list[dict]:
-        ws = self.spreadsheet.worksheet(INPUT_SHEET)
+        try:
+            ws = self.spreadsheet.worksheet(INPUT_SHEET)
+        except Exception:
+            ws = self.spreadsheet.get_worksheet(0)
+        print(f"  Reading from sheet: '{ws.title}'")
         rows = ws.get_all_values()
         # Skip header rows — find rows where col 5 (FSN) looks like a real FSN
         products = []
