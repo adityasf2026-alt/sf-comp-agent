@@ -58,7 +58,7 @@ class SheetsWriter:
 
     # ── Read FSN Input ──────────────────────────────────────────────────
     def read_fsn_input(self) -> list[dict]:
-        rows = self._get(f"{INPUT_SHEET}!A1:H200")
+        rows = self._get(f"'{INPUT_SHEET}!A1:H200")
         if not rows:
             return []
         # Find the data header row (row with "FSN" in it)
