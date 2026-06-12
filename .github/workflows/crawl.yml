@@ -42,7 +42,6 @@ jobs:
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
         run: |
-          cd src
           python scraper.py
 
       - name: Upload run log
